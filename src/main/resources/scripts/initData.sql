@@ -1,0 +1,47 @@
+-- Создание пациентов
+INSERT INTO "PUBLIC"."PATIENTS"
+("FIRST_NAME", "MIDDLE_NAME", "LAST_NAME", "PHONE")
+VALUES
+('Пупкин', 'Василий', 'Петрович', '+79271110101');
+INSERT INTO "PUBLIC"."PATIENTS"
+("FIRST_NAME", "MIDDLE_NAME", "LAST_NAME", "PHONE")
+VALUES
+('Тараканов', 'Василий', 'Иванович', '+79271110202');
+INSERT INTO "PUBLIC"."PATIENTS"
+("FIRST_NAME", "MIDDLE_NAME", "LAST_NAME", "PHONE")
+VALUES
+('Тараканов', 'Михаил', 'Сергеевич', '89271110303');
+
+
+-- Создание врачей
+INSERT INTO "PUBLIC"."DOCTORS"
+("FIRST_NAME", "MIDDLE_NAME", "LAST_NAME", "SPECIALIZATION")
+VALUES
+('Абрамов', 'Генадий', 'Петрович', 'Терапевт');
+INSERT INTO "PUBLIC"."DOCTORS"
+("FIRST_NAME", "MIDDLE_NAME", "LAST_NAME", "SPECIALIZATION")
+VALUES
+('Никушин', 'Александр', 'Станиславович', 'Нарколог');
+
+
+-- Создание рецептов
+INSERT INTO "PUBLIC"."RECIPES"
+("DESCRIPTION", "PATIENT", "DOCTOR", "DATE_CREATE", "DURATION", "PRIORITY")
+VALUES
+('Описание рецепта №1', 1, 1, '2018-08-08', '2018-08-09', 0);
+INSERT INTO "PUBLIC"."RECIPES"
+("DESCRIPTION", "PATIENT", "DOCTOR", "DATE_CREATE", "DURATION", "PRIORITY")
+VALUES
+('Описание рецепта №2', 1, 0, '2018-07-01', '2018-07-15', 2);
+INSERT INTO "PUBLIC"."RECIPES"
+("DESCRIPTION", "PATIENT", "DOCTOR", "DATE_CREATE", "DURATION", "PRIORITY")
+VALUES
+('Описание рецепта №3', 2, 0, '2018-07-01', '2018-07-15', 2);
+INSERT INTO "PUBLIC"."RECIPES"
+("DESCRIPTION", "PATIENT", "DOCTOR", "DATE_CREATE", "DURATION", "PRIORITY")
+VALUES
+('Описание рецепта №4', 2, 1, '2018-07-01', '2018-07-15', 0);
+INSERT INTO "PUBLIC"."RECIPES"
+("DESCRIPTION", "PATIENT", "DOCTOR", "DATE_CREATE", "DURATION", "PRIORITY")
+VALUES
+('Описание рецепта №5', 1, 0, '2018-07-01', '2018-07-15', 1);

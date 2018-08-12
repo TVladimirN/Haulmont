@@ -1,88 +1,101 @@
 package com.haulmont.testtask.ui;
 
-import com.haulmont.testtask.dao.PatientDAO;
+
 import com.haulmont.testtask.item.Patient;
-import com.haulmont.testtask.ui.field.PhoneTextField;
+import com.haulmont.testtask.repository.PatientRepository;
 import com.haulmont.testtask.ui.modal.ModalEditorWindow;
-import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.server.UICreateEvent;
-import com.vaadin.server.communication.UIInitHandler;
-import com.vaadin.shared.ui.grid.HeightMode;
+import com.haulmont.testtask.ui.table.Table;
+import com.sun.istack.internal.Nullable;
+import com.vaadin.navigator.View;
+import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.PostConstruct;
+import java.util.HashSet;
+import java.util.Set;
 
-import static com.haulmont.testtask.utils.ComponentUtil.buildTextField;
+@UIScope
+@SpringView
+public class PatientsTab extends VerticalLayout implements View {
 
-public class PatientsTab extends VerticalLayout {
+    @Autowired
+    private PatientRepository patientRepository;
 
-    private final UI ui;
     private Button editPatient = new Button("Изменить");
     private Button removePatient = new Button("Удалить");
-    private Tabs.MyTable<Patient> patientsTable = new Tabs.MyTable<>(null, Patient.class);
+    private Table<Patient> patientsTable = new Table<>(Patient.class);
 
-    private Object itemIdSelected;
+    private Patient itemSelected;
+    private Set<Patient> patientList;
 
-    public PatientsTab(UI parentUI) {
-        this.ui = parentUI;
+    @PostConstruct
+    public void init() {
         this.editPatient.setEnabled(false);
         this.removePatient.setEnabled(false);
         setCaption("Пациенты");
 
-
         addComponent(patientsTable);
+
         patientsTable.addItemClickListener(itemClickEvent -> {
             this.editPatient.setEnabled(true);
             this.removePatient.setEnabled(true);
-            itemIdSelected = itemClickEvent.getItemId();
+            itemSelected = itemClickEvent.getItem();
         });
 
         GridLayout gridLayout = new GridLayout(3, 1);
         gridLayout.setSpacing(true);
         gridLayout.addComponent(new Button("Добавить") {{
-            addClickListener(clickEvent -> addModalWindow());
+            addClickListener(clickEvent -> {
+                openModalEditorWindow(new Patient());
+            });
         }});
 
-
+        editPatient.addClickListener(clickEvent -> {
+            openModalEditorWindow(itemSelected);
+        });
         gridLayout.addComponent(editPatient);
 
         removePatient.addClickListener(clickEvent -> {
-            this.patientsTable.removeItem(this.itemIdSelected);
-            this.editPatient.setEnabled(false);
-            this.removePatient.setEnabled(false);
+            try {
+                patientRepository.delete(itemSelected.getId());
+                this.patientList.remove(itemSelected);
+                this.patientsTable.setItems(patientList);
+                this.editPatient.setEnabled(false);
+                this.removePatient.setEnabled(false);
+            } catch (DataIntegrityViolationException e) {
+                new Notification(
+                        "Вы не можете удалить пациента для которого есть рецепт!",
+                        Notification.Type.ERROR_MESSAGE
+                ).show(this.getUI().getPage());
+            }
         });
         gridLayout.addComponent(removePatient);
 
         addComponent(gridLayout);
 
+        patientList = new HashSet<>(Patient.convertListPatientDaoToListPatient(patientRepository.findAll()));
+        patientsTable.setItems(patientList);
     }
 
-    private void addModalWindow(){
-        this.ui.addWindow(new ModalEditorWindow(
-                "Добавление нового пользователя",
-                new Component[]{
-                        buildTextField("Имя"),
-                        buildTextField("Фамилия"),
-                        buildTextField("Отчество"),
-                        new PhoneTextField()
+    private void openModalEditorWindow(@Nullable Patient p) {
+        ModalEditorWindow<Patient> modalEditorWindow =
+                new ModalEditorWindow<>("Редактирование пациента", Patient.class, p);
+        modalEditorWindow.addAcceptListener(
+                clickEvent -> {
+                    try {
+                        patientList.add(p);
+                        patientRepository.save(Patient.convertPatientItemToPatientDAO(p));
+                        patientsTable.setItems(patientList);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-
-        ){{addAcceptListener(clickEvent1 -> {
-            patientsTable.addItem(new Patient(){{
-                setFirstName("first");
-                setMiddleName("middle");
-                setLastName("last");
-                setPhone("phone");
-            }});
-            close();
-        });}});
+        );
+        UI.getCurrent().addWindow(modalEditorWindow);
+        int a = 2;
     }
-
-    private void editModalWindow() {
-
-    }
-
 
 }

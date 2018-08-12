@@ -1,91 +1,105 @@
 package com.haulmont.testtask.item;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import com.haulmont.testtask.ui.annotation.ComponentName;
+import com.haulmont.testtask.ui.modal.ModalComponent;
+import com.haulmont.testtask.ui.table.TableComponent;
 
-@Item.ItemContainerInfos({
-        @Item.ItemContainerInfo(
-                propertyId = "firstName",
-                type = String.class,
-                defaultValue = "",
-                header = "Фамилия"
-        ),
-        @Item.ItemContainerInfo(
-                propertyId = "middleName",
-                type = String.class,
-                defaultValue = "",
-                header = "Имя"
-        ),
-        @Item.ItemContainerInfo(
-                propertyId = "lastName",
-                type = String.class,
-                defaultValue = "",
-                header = "Отчество"
-        ),
-        @Item.ItemContainerInfo(
-                propertyId = "phone",
-                type = String.class,
-                defaultValue = "",
-                header = "Телефон"
-        ),
+import java.util.List;
+import java.util.stream.Collectors;
 
-})
-public class Patient implements Item {
+public class Patient {
 
-    private static final String FIRST_NAME_ID = "firstName";
-    private static final String MIDDLE_NAME_ID = "middleName";
-    private static final String LAST_NAME_ID = "lastName";
-    private static final String PHONE_ID = "phone";
+    @ComponentName("id")
+    @TableComponent(order = 0, render = false)
+    private Long id;
+    @ComponentName("Фамилия")
+    @TableComponent(order = 1, render = true)
+    @ModalComponent
+    private String firstName;
+    @ComponentName("Имя")
+    @TableComponent(order = 2, render = true)
+    @ModalComponent
+    private String middleName;
+    @ComponentName("Отчество")
+    @TableComponent(order = 3, render = true)
+    @ModalComponent
+    private String lastName;
+    @ComponentName("Телефон")
+    @TableComponent(order = 4, render = true)
+    @ModalComponent(componentType = ModalComponent.Type.PHONE_FIELD)
+    private String phone;
 
-    private Map<Object, Object> properties;
+    public static Patient convertPatientDaoToPatient(com.haulmont.testtask.dao.Patient patient) {
+        Patient _patient = new Patient();
+        _patient.setId(Long.valueOf(patient.getId()));
+        _patient.setFirstName(patient.getFirstName());
+        _patient.setMiddleName(patient.getMiddleName());
+        _patient.setLastName(patient.getLastName());
+        _patient.setPhone(patient.getPhone());
 
-    public Patient() {
-        this.properties = new HashMap<>();
+        return _patient;
     }
 
+    public static List<Patient> convertListPatientDaoToListPatient(List<com.haulmont.testtask.dao.Patient> patients) {
+        return patients.stream().map(Patient::convertPatientDaoToPatient).collect(Collectors.toList());
+    }
+
+    public static com.haulmont.testtask.dao.Patient convertPatientItemToPatientDAO(Patient patient){
+        com.haulmont.testtask.dao.Patient _paPatient = new com.haulmont.testtask.dao.Patient();
+        _paPatient.setId(patient.getId());
+        _paPatient.setFirstName(patient.getFirstName());
+        _paPatient.setMiddleName(patient.getMiddleName());
+        _paPatient.setLastName(patient.getLastName());
+        _paPatient.setPhone(patient.getPhone());
+
+        return _paPatient;
+    }
+
+    public Patient() {
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getFirstName() {
-        return (String) this.properties.get(FIRST_NAME_ID);
+        return this.firstName;
     }
 
     public void setFirstName(String firstName) {
-        this.properties.put(FIRST_NAME_ID, firstName);
+        this.firstName = firstName;
     }
 
     public String getMiddleName() {
-        return (String) this.properties.get(MIDDLE_NAME_ID);
+        return this.middleName;
     }
 
     public void setMiddleName(String middleName) {
-        this.properties.put(MIDDLE_NAME_ID, middleName);
+        this.middleName = middleName;
     }
 
     public String getLastName() {
-        return (String) this.properties.get(LAST_NAME_ID);
+        return this.lastName;
     }
 
     public void setLastName(String lastName) {
-        this.properties.put(LAST_NAME_ID, lastName);
+        this.lastName = lastName;
     }
 
     public String getPhone() {
-        return (String) this.properties.get(PHONE_ID);
+        return this.phone;
     }
 
     public void setPhone(String phone) {
-        this.properties.put(PHONE_ID, phone);
-    }
-
-
-    @Override
-    public Collection<?> getIds() {
-        return this.properties.keySet();
+        this.phone = phone;
     }
 
     @Override
-    public Object getValueById(Object o) {
-        return this.properties.get(o);
+    public String toString() {
+        return this.firstName + " " + this.middleName + " " + this.lastName;
     }
-
 }

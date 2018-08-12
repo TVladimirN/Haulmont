@@ -1,88 +1,103 @@
 package com.haulmont.testtask.item;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import com.haulmont.testtask.dao.DoctorDAO;
+import com.haulmont.testtask.ui.annotation.ComponentName;
+import com.haulmont.testtask.ui.modal.ModalComponent;
+import com.haulmont.testtask.ui.table.TableComponent;
 
-@Item.ItemContainerInfos({
-        @Item.ItemContainerInfo(
-                propertyId = "firstName",
-                type = String.class,
-                defaultValue = "",
-                header = "Фамилия"
-        ),
-        @Item.ItemContainerInfo(
-                propertyId = "middleName",
-                type = String.class,
-                defaultValue = "",
-                header = "Имя"
-        ),
-        @Item.ItemContainerInfo(
-                propertyId = "lastName",
-                type = String.class,
-                defaultValue = "",
-                header = "Отчество"
-        ),
-        @Item.ItemContainerInfo(
-                propertyId = "specialization",
-                type = String.class,
-                defaultValue = "",
-                header = "Специализация"
-        ),
+import java.util.List;
+import java.util.stream.Collectors;
 
-})
-public class Doctor implements Item {
+public class Doctor {
 
-    private static final String FIRST_NAME_ID = "firstName";
-    private static final String MIDDLE_NAME_ID = "middleName";
-    private static final String LAST_NAME_ID = "lastName";
-    private static final String SPECIALIZATION_ID = "specialization";
+    @ComponentName("id")
+    @TableComponent(order = 0, render = false)
+    private Long id;
+    @ComponentName("Фамилия")
+    @TableComponent(order = 1, render = true)
+    @ModalComponent
+    private String firstName;
+    @ComponentName("Имя")
+    @TableComponent(order = 2, render = true)
+    @ModalComponent
+    private String middleName;
+    @ComponentName("Отчество")
+    @TableComponent(order = 3, render = true)
+    @ModalComponent
+    private String lastName;
+    @ComponentName("Специализация")
+    @TableComponent(order = 4, render = true)
+    @ModalComponent
+    private String specialization;
 
-    private Map<Object, Object> properties;
+    public static Doctor convertDoctorDaoToDoctor(DoctorDAO doctor) {
+        Doctor _doctor = new Doctor();
+        _doctor.setId(doctor.getId());
+        _doctor.setFirstName(doctor.getFirstName());
+        _doctor.setMiddleName(doctor.getMiddleName());
+        _doctor.setLastName(doctor.getLastName());
+        _doctor.setSpecialization(doctor.getSpecialization());
 
-    public Doctor() {
-        this.properties = new HashMap<>();
+        return _doctor;
+    }
+
+    public static List<Doctor> convertListDoctorDaoToListDoctor(List<DoctorDAO> doctors) {
+        return doctors.stream().map(Doctor::convertDoctorDaoToDoctor).collect(Collectors.toList());
+    }
+
+    public static DoctorDAO converDoctorToDoctorDAO(Doctor doctor){
+        DoctorDAO doctorDAO = new DoctorDAO();
+        doctorDAO.setId(doctor.getId());
+        doctorDAO.setFirstName(doctor.getFirstName());
+        doctorDAO.setMiddleName(doctor.getMiddleName());
+        doctorDAO.setLastName(doctor.getLastName());
+        doctorDAO.setSpecialization(doctor.getSpecialization());
+
+        return doctorDAO;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFirstName() {
-        return (String) this.properties.get(FIRST_NAME_ID);
+        return this.firstName;
     }
 
     public void setFirstName(String firstName) {
-        this.properties.put(FIRST_NAME_ID, firstName);
+        this.firstName = firstName;
     }
 
     public String getMiddleName() {
-        return (String) this.properties.get(MIDDLE_NAME_ID);
+        return this.middleName;
     }
 
     public void setMiddleName(String middleName) {
-        this.properties.put(MIDDLE_NAME_ID, middleName);
+        this.middleName = middleName;
     }
 
     public String getLastName() {
-        return (String) this.properties.get(LAST_NAME_ID);
+        return this.lastName;
     }
 
     public void setLastName(String lastName) {
-        this.properties.put(LAST_NAME_ID, lastName);
+        this.lastName = lastName;
     }
 
     public String getSpecialization() {
-        return (String) this.properties.get(SPECIALIZATION_ID);
+        return this.specialization;
     }
 
     public void setSpecialization(String specialization) {
-        this.properties.put(SPECIALIZATION_ID, specialization);
+        this.specialization = specialization;
     }
 
     @Override
-    public Collection<?> getIds() {
-        return null;
-    }
-
-    @Override
-    public Object getValueById(Object o) {
-        return null;
+    public String toString() {
+        return this.firstName + " " + this.middleName + " " + this.lastName;
     }
 }

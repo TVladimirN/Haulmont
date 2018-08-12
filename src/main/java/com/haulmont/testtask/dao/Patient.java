@@ -4,15 +4,14 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
-@Entity(name = "doctors")
-public class DoctorDAO implements Serializable {
+@Entity(name = "patients")
+public class Patient implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "doctor_id", nullable = false, insertable = false, updatable = false, unique = true)
+    @Column(name = "patient_id", nullable = false, insertable = false, updatable = false, unique = true)
     private Long id;
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -20,8 +19,8 @@ public class DoctorDAO implements Serializable {
     private String middleName;
     @Column(name = "last_name", nullable = false)
     private String lastName;
-    @Column(nullable = false)
-    private String specialization;
+    @Column(name = "phone")
+    private String phone;
 
     public Long getId() {
         return this.id;
@@ -55,24 +54,23 @@ public class DoctorDAO implements Serializable {
         this.lastName = lastName;
     }
 
-    public String getSpecialization() {
-        return this.specialization;
+    public String getPhone() {
+        return this.phone;
     }
 
-    public void setSpecialization(String specialization) {
-        this.specialization = specialization;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DoctorDAO)) return false;
-        DoctorDAO that = (DoctorDAO) o;
+        if (!(o instanceof Patient)) return false;
+        Patient that = (Patient) o;
         return Objects.equals(getId(), that.getId()) &&
                 Objects.equals(getFirstName(), that.getFirstName()) &&
                 Objects.equals(getMiddleName(), that.getMiddleName()) &&
-                Objects.equals(getLastName(), that.getLastName()) &&
-                Objects.equals(getSpecialization(), that.getSpecialization());
+                Objects.equals(getLastName(), that.getLastName());
     }
 
     @Override
@@ -81,8 +79,7 @@ public class DoctorDAO implements Serializable {
                 getId(),
                 getFirstName(),
                 getMiddleName(),
-                getLastName(),
-                getSpecialization()
+                getLastName()
         );
     }
 }

@@ -1,36 +1,30 @@
-package com.haulmont.testtask.ui;
+package com.haulmont.testtask.ui.table;
 
 import com.haulmont.testtask.item.Doctor;
 import com.haulmont.testtask.repository.DoctorRepository;
 import com.haulmont.testtask.ui.modal.ModalEditorWindow;
-import com.haulmont.testtask.ui.table.Table;
 import com.sun.istack.internal.Nullable;
 import com.vaadin.navigator.View;
-import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import javax.annotation.PostConstruct;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-@UIScope
-@SpringView
-public class DoctorsTab extends VerticalLayout implements View {
+public class CommonTable<ITEM> extends VerticalLayout implements View {
 
     @Autowired
     private DoctorRepository doctorRepository;
 
     private Button editDoctor = new Button("Изменить");
     private Button removeDoctor = new Button("Удалить");
-    private Table<Doctor> doctorsTable = new Table<>(Doctor.class);
+    private Table<ITEM> doctorsTable = new Table<>(ITEM.class);
 
 
-    private Doctor itemSelected;
-    private Set<Doctor> doctorList;
+    private ITEM itemSelected;
+    private Set<ITEM> doctorList;
 
     @PostConstruct
     public void init() {

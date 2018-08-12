@@ -1,30 +1,39 @@
 package com.haulmont.testtask.utils;
 
+import com.haulmont.testtask.ui.field.NotNullNotEmptyTextField;
+import com.haulmont.testtask.ui.validation.NotEmptyFieldValidator;
+import com.vaadin.data.Binder;
 import com.vaadin.data.validator.StringLengthValidator;
-import com.vaadin.event.FieldEvents;
-import com.vaadin.ui.*;
+import com.vaadin.shared.ui.ValueChangeMode;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.TextField;
 
 public class ComponentUtil {
 
 
     public static TextField buildTextField(String caption) {
         int maxLength = 30;
-        TextField textField = new TextField();
+        NotNullNotEmptyTextField textField = new NotNullNotEmptyTextField();
         textField.setCaption(caption);
         textField.setMaxLength(maxLength);
         textField.setWidth("285");
 
-        textField.addValidator(new StringLengthValidator(
-                "Введите имя",
-                2,
-                maxLength,
-                true
-        ));
+        new Binder<String>().forField(textField)
+                .asRequired(new NotEmptyFieldValidator<>())
+                .withValidator(new StringLengthValidator(
+                        "Введите имя",
+                        2,
+                        maxLength
+                ))
+                .bind(s -> s, (s, s2) -> s = s2)
+                .validate();
 
-        textField.setTextChangeEventMode(AbstractTextField.TextChangeEventMode.EAGER);
-        textField.addTextChangeListener(
-                (FieldEvents.TextChangeListener) textChangeEvent -> ((TextField) textChangeEvent.getSource())
-                        .setValue(textChangeEvent.getText().replaceAll("[^a-zA-Z][0-9]?", "")));
+        textField.setValueChangeMode(ValueChangeMode.EAGER);
+        textField.addValueChangeListener(textChangeEvent ->
+                textChangeEvent.getSource()
+                        .setValue(textChangeEvent.getValue().replaceAll("[^a-zA-Z][0-9]?", "")));
 
         return textField;
     }
@@ -34,7 +43,7 @@ public class ComponentUtil {
             ((TextField) component).setValue("");
         } else if (component instanceof ComboBox) {
             ComboBox comboBox = (ComboBox) component;
-            comboBox.setValue(comboBox.getItemIds().iterator().next());
+            comboBox.setSelectedItem("+7");
         } else if (component instanceof GridLayout) {
             GridLayout gridLayout = (GridLayout) component;
             for (int i = 0; i < gridLayout.getRows(); i++) {
@@ -44,4 +53,5 @@ public class ComponentUtil {
             }
         }
     }
+
 }
