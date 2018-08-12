@@ -3,6 +3,7 @@ package com.haulmont.testtask.ui.table;
 import com.haulmont.testtask.ui.annotation.ComponentName;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.ui.Grid;
+import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -52,7 +53,17 @@ public class Table<TYPE> extends Grid<TYPE> {
             field.setAccessible(true);
             Grid.Column column = grid.addColumn((ValueProvider<?, Object>) value -> {
                 try {
-                    return field.get(value);
+                    ToString toString = columnAnnotation.string();
+                    if (toString.parameter().length == 0) {
+                        return field.get(value);
+                    } else {
+                        StringBuilder sb = new StringBuilder();
+                        for (String parameter : toString.parameter()) {
+                            sb.append(ReflectionUtils.findMethod(field.getType(), parameter).invoke(field.get(value)));
+                            sb.append(toString.delimiter());
+                        }
+                        return sb.toString();
+                    }
                 } catch (Exception e) {
                     return new Exception();
                 }

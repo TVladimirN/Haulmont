@@ -1,5 +1,6 @@
 package com.haulmont.testtask.item;
 
+import com.haulmont.testtask.dao.PatientDAO;
 import com.haulmont.testtask.ui.annotation.ComponentName;
 import com.haulmont.testtask.ui.modal.ModalComponent;
 import com.haulmont.testtask.ui.table.TableComponent;
@@ -7,7 +8,7 @@ import com.haulmont.testtask.ui.table.TableComponent;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Patient {
+public class Patient implements Item {
 
     @ComponentName("id")
     @TableComponent(order = 0, render = false)
@@ -29,9 +30,9 @@ public class Patient {
     @ModalComponent(componentType = ModalComponent.Type.PHONE_FIELD)
     private String phone;
 
-    public static Patient convertPatientDaoToPatient(com.haulmont.testtask.dao.Patient patient) {
+    public static Patient convertPatientDaoToPatient(PatientDAO patient) {
         Patient _patient = new Patient();
-        _patient.setId(Long.valueOf(patient.getId()));
+        _patient.setId(patient.getId());
         _patient.setFirstName(patient.getFirstName());
         _patient.setMiddleName(patient.getMiddleName());
         _patient.setLastName(patient.getLastName());
@@ -40,12 +41,12 @@ public class Patient {
         return _patient;
     }
 
-    public static List<Patient> convertListPatientDaoToListPatient(List<com.haulmont.testtask.dao.Patient> patients) {
+    public static List<Patient> convertListPatientDaoToListPatient(List<PatientDAO> patients) {
         return patients.stream().map(Patient::convertPatientDaoToPatient).collect(Collectors.toList());
     }
 
-    public static com.haulmont.testtask.dao.Patient convertPatientItemToPatientDAO(Patient patient){
-        com.haulmont.testtask.dao.Patient _paPatient = new com.haulmont.testtask.dao.Patient();
+    public static PatientDAO convertPatientItemToPatientDAO(Patient patient) {
+        PatientDAO _paPatient = new PatientDAO();
         _paPatient.setId(patient.getId());
         _paPatient.setFirstName(patient.getFirstName());
         _paPatient.setMiddleName(patient.getMiddleName());
@@ -101,5 +102,21 @@ public class Patient {
     @Override
     public String toString() {
         return this.firstName + " " + this.middleName + " " + this.lastName;
+    }
+
+    @Override
+    public PatientDAO converItemToDao() {
+        return convertPatientItemToPatientDAO(this);
+    }
+
+    @Override
+    public void fillItemFromDAO(Object object) {
+        PatientDAO patientDAO = (PatientDAO) object;
+        setId(patientDAO.getId());
+        setFirstName(patientDAO.getFirstName());
+        setMiddleName(patientDAO.getMiddleName());
+        setLastName(patientDAO.getLastName());
+        setPhone(patientDAO.getPhone());
+
     }
 }

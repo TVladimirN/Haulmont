@@ -60,7 +60,7 @@ public class PatientsTab extends VerticalLayout implements View {
 
         removePatient.addClickListener(clickEvent -> {
             try {
-                patientRepository.delete(itemSelected.getId());
+                patientRepository.delete(Patient.convertPatientItemToPatientDAO(itemSelected));
                 this.patientList.remove(itemSelected);
                 this.patientsTable.setItems(patientList);
                 this.editPatient.setEnabled(false);

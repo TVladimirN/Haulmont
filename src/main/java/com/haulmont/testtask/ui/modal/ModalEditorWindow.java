@@ -1,5 +1,6 @@
 package com.haulmont.testtask.ui.modal;
 
+import com.haulmont.testtask.dao.PatientDAO;
 import com.haulmont.testtask.item.Patient;
 import com.haulmont.testtask.repository.DoctorRepository;
 import com.haulmont.testtask.repository.PatientRepository;
@@ -42,7 +43,7 @@ public class ModalEditorWindow<T> extends Window {
         this.repositories = repositories;
     }
 
-    public ModalEditorWindow(String label, Class<T> type, T defaultItem) {
+    public ModalEditorWindow(String label, Class<?> type, T defaultItem) {
         this(label, type);
         if (null != defaultItem) {
             this.binder.readBean(defaultItem);
@@ -50,7 +51,7 @@ public class ModalEditorWindow<T> extends Window {
         }
     }
 
-    public ModalEditorWindow(String label, Class<T> type) {
+    public ModalEditorWindow(String label, Class<?> type) {
         this.binder = new Binder<>();
         this.type = type;
         this.components = new HashMap<>();
@@ -179,9 +180,8 @@ public class ModalEditorWindow<T> extends Window {
                     if (!(modalComponent.object().isPrimitive())) {
                         Object c = repositories.get(modalComponent.object());
                         comboBox.setItems(
-                                Patient.convertListPatientDaoToListPatient(
-                                        (List<com.haulmont.testtask.dao.Patient>) ReflectionUtils.findMethod(c.getClass(), modalComponent.dataSource())
-                                                .invoke(c))
+                                ReflectionUtils.findMethod(c.getClass(), modalComponent.dataSource())
+                                        .invoke(c)
                         );
                     }
                 } catch (Exception ignore) {

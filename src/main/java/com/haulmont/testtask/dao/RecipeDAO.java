@@ -1,6 +1,12 @@
 package com.haulmont.testtask.dao;
 
 
+import com.haulmont.testtask.repository.PatientRepository;
+import com.haulmont.testtask.ui.annotation.ComponentName;
+import com.haulmont.testtask.ui.modal.ModalComponent;
+import com.haulmont.testtask.ui.table.TableComponent;
+import com.haulmont.testtask.ui.table.ToString;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -14,22 +20,51 @@ public class RecipeDAO implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recipe_id", nullable = false, insertable = false, updatable = false, unique = true)
+    @ComponentName("id")
+    @TableComponent(order = 0, render = false)
     private Long id;
+
     @Column(name = "description", nullable = false)
+    @ComponentName("Описание")
+    @TableComponent(order = 1, render = true)
+    @ModalComponent(componentType = ModalComponent.Type.TEXT_AREA)
     private String description;
-    //    @OneToOne(optional = false, targetEntity = Patient.class)
-    @ManyToOne(optional = false, targetEntity = Patient.class)
+
+    @ManyToOne(optional = false, targetEntity = PatientDAO.class)
     @JoinColumn(name = "patient", foreignKey = @ForeignKey(name = "patient_id"))
-    private Patient patient;
-    //    @OneToOne(optional = false, targetEntity = DoctorDAO.class)
+    @ComponentName("Пациент")
+    @TableComponent(order = 2, render = true,
+            string = @ToString(parameter = {"getFirstName", "getMiddleName", "getLastName"}))
+    @ModalComponent(
+            componentType = ModalComponent.Type.COMBO_BOX,
+            object = PatientRepository.class,
+            dataSource = "findAll")
+    private PatientDAO patient;
+
     @ManyToOne(optional = false, targetEntity = DoctorDAO.class)
     @JoinColumn(name = "doctor", foreignKey = @ForeignKey(name = "doctor_id"))
+    @ComponentName("Врач")
+    @TableComponent(order = 3, render = true,
+            string = @ToString(parameter = {"getFirstName", "getMiddleName", "getLastName"}))
+    @ModalComponent//(componentType = ModalComponent.Type.COMBO_BOX)
     private DoctorDAO doctor;
+
     @Column(name = "date_create", nullable = false)
+    @ComponentName("Дата создания")
+    @TableComponent(order = 4, render = true)
+    @ModalComponent(componentType = ModalComponent.Type.DATE)
     private Date dateCreate;
+
     @Column(name = "duration", nullable = false)
+    @ComponentName("Срок действия")
+    @TableComponent(order = 5, render = true)
+    @ModalComponent(componentType = ModalComponent.Type.DATE)
     private Date duration;
+
     @Column(name = "priority", nullable = false)
+    @ComponentName("Приоритет")
+    @TableComponent(order = 6, render = true)
+    @ModalComponent//(componentType = ModalComponent.Type.COMBO_BOX)
     private RecipePriority priority;
 
     public Long getId() {
@@ -48,11 +83,11 @@ public class RecipeDAO implements Serializable {
         this.description = description;
     }
 
-    public Patient getPatient() {
+    public PatientDAO getPatient() {
         return this.patient;
     }
 
-    public void setPatient(Patient patient) {
+    public void setPatient(PatientDAO patient) {
         this.patient = patient;
     }
 
