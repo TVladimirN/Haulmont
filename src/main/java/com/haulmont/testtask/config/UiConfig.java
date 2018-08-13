@@ -1,8 +1,8 @@
 package com.haulmont.testtask.config;
 
-import com.haulmont.testtask.dao.DoctorDAO;
-import com.haulmont.testtask.dao.PatientDAO;
-import com.haulmont.testtask.dao.RecipeDAO;
+import com.haulmont.testtask.payload.dao.DoctorDAO;
+import com.haulmont.testtask.payload.dao.PatientDAO;
+import com.haulmont.testtask.payload.dao.RecipeDAO;
 import com.haulmont.testtask.ui.table.CommonTable;
 import com.vaadin.ui.Component;
 import org.springframework.beans.factory.annotation.Autowired;

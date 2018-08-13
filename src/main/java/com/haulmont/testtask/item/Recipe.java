@@ -1,7 +1,7 @@
 package com.haulmont.testtask.item;
 
-import com.haulmont.testtask.dao.RecipeDAO;
-import com.haulmont.testtask.dao.RecipePriority;
+import com.haulmont.testtask.payload.dao.RecipeDAO;
+import com.haulmont.testtask.payload.RecipePriority;
 import com.haulmont.testtask.repository.PatientRepository;
 import com.haulmont.testtask.ui.annotation.ComponentName;
 import com.haulmont.testtask.ui.modal.ModalComponent;

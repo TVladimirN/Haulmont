@@ -15,10 +15,6 @@ import javax.annotation.PostConstruct;
 public class Tabs extends TabSheet implements View {
 
     @Autowired
-    private PatientsTab patientsTab;
-    @Autowired
-    private DoctorsTab doctorsTab;
-    @Autowired
     private RecipesTab recipesTab;
 
     @Autowired
@@ -33,20 +29,14 @@ public class Tabs extends TabSheet implements View {
     @Qualifier("recipesTable")
     private Component recipesTable;
 
-    @Autowired
-    private CrudService crudService;
-
+//    @Autowired
+//    private CrudService crudService;
 
     @PostConstruct
     void init() {
-
         addTab(patientsTable);
         addTab(doctorsTable);
         addTab(recipesTable);
-
-//        addTab(patientsTab);
-//        addTab(doctorsTab);
-//        addTab(recipesTab);
     }
 
 }

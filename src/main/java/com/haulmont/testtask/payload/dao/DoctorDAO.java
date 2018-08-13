@@ -1,4 +1,4 @@
-package com.haulmont.testtask.dao;
+package com.haulmont.testtask.payload.dao;
 
 import com.haulmont.testtask.ui.annotation.ComponentName;
 import com.haulmont.testtask.ui.modal.ModalComponent;
@@ -12,7 +12,6 @@ import java.util.Objects;
 public class DoctorDAO implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,6 +1,6 @@
 package com.haulmont.testtask.item;
 
-import com.haulmont.testtask.dao.PatientDAO;
+import com.haulmont.testtask.payload.dao.PatientDAO;
 import com.haulmont.testtask.ui.annotation.ComponentName;
 import com.haulmont.testtask.ui.modal.ModalComponent;
 import com.haulmont.testtask.ui.table.TableComponent;

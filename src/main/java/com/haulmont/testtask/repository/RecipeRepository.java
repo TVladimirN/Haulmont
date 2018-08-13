@@ -1,6 +1,6 @@
 package com.haulmont.testtask.repository;
 
-import com.haulmont.testtask.dao.RecipeDAO;
+import com.haulmont.testtask.payload.dao.RecipeDAO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 

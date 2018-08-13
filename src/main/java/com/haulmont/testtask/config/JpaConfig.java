@@ -23,6 +23,16 @@ import java.sql.SQLException;
 @EnableJpaRepositories("com.haulmont.testtask.repository")
 public class JpaConfig {
 
+//    @Autowired
+//    private BeanFactory beanFactory;
+//
+//    @PostConstruct
+//    public void crudService(){
+//        RootBeanDefinition rootBeanDefinition = new RootBeanDefinition(CrudService.class);
+//        rootBeanDefinition.setAbstract(true);
+//        ((DefaultListableBeanFactory) beanFactory).registerBeanDefinition("crudService", rootBeanDefinition);
+//    }
+
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
@@ -34,7 +44,7 @@ public class JpaConfig {
         factory.setJpaVendorAdapter(vendorAdapter);
         factory.setPackagesToScan(
                 getClass().getPackage().getName(),
-                "com.haulmont.testtask.dao"
+                "com.haulmont.testtask.payload.dao"
         );
 
         factory.setDataSource(dataSource);

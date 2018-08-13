@@ -1,10 +1,6 @@
 package com.haulmont.testtask.ui.modal;
 
-import com.haulmont.testtask.dao.PatientDAO;
-import com.haulmont.testtask.item.Patient;
-import com.haulmont.testtask.repository.DoctorRepository;
-import com.haulmont.testtask.repository.PatientRepository;
-import com.haulmont.testtask.repository.RecipeRepository;
+import com.haulmont.testtask.payload.dao.PatientDAO;
 import com.haulmont.testtask.ui.annotation.ComponentName;
 import com.haulmont.testtask.ui.field.PhoneTextField;
 import com.vaadin.data.Binder;
