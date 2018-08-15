@@ -1,16 +1,17 @@
 package com.haulmont.testtask.payload.dao;
 
 
+import com.haulmont.testtask.converter.LocalDateConverter;
 import com.haulmont.testtask.payload.RecipePriority;
 import com.haulmont.testtask.repository.PatientRepository;
 import com.haulmont.testtask.ui.annotation.ComponentName;
 import com.haulmont.testtask.ui.modal.ModalComponent;
 import com.haulmont.testtask.ui.table.TableComponent;
-import com.haulmont.testtask.ui.table.ToString;
+import com.haulmont.testtask.ui.annotation.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity(name = "recipes")
@@ -39,7 +40,8 @@ public class RecipeDAO implements Serializable {
     @ModalComponent(
             componentType = ModalComponent.Type.COMBO_BOX,
             object = PatientRepository.class,
-            dataSource = "findAll")
+            dataSource = "findAll",
+            string = @ToString(parameter = {"getFirstName", "getMiddleName", "getLastName"}))
     private PatientDAO patient;
 
     @ManyToOne(optional = false, targetEntity = DoctorDAO.class)
@@ -54,13 +56,15 @@ public class RecipeDAO implements Serializable {
     @ComponentName("Дата создания")
     @TableComponent(order = 4, render = true)
     @ModalComponent(componentType = ModalComponent.Type.DATE)
-    private Date dateCreate;
+    @Convert(converter = LocalDateConverter.class)
+    private LocalDate dateCreate;
 
     @Column(name = "duration", nullable = false)
     @ComponentName("Срок действия")
     @TableComponent(order = 5, render = true)
     @ModalComponent(componentType = ModalComponent.Type.DATE)
-    private Date duration;
+    @Convert(converter = LocalDateConverter.class)
+    private LocalDate duration;
 
     @Column(name = "priority", nullable = false)
     @ComponentName("Приоритет")
@@ -100,19 +104,19 @@ public class RecipeDAO implements Serializable {
         this.doctor = doctor;
     }
 
-    public Date getDateCreate() {
+    public LocalDate getDateCreate() {
         return this.dateCreate;
     }
 
-    public void setDateCreate(Date dateCreate) {
+    public void setDateCreate(LocalDate dateCreate) {
         this.dateCreate = dateCreate;
     }
 
-    public Date getDuration() {
+    public LocalDate getDuration() {
         return this.duration;
     }
 
-    public void setDuration(Date duration) {
+    public void setDuration(LocalDate duration) {
         this.duration = duration;
     }
 

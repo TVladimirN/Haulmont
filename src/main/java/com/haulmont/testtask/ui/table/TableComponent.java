@@ -1,5 +1,7 @@
 package com.haulmont.testtask.ui.table;
 
+import com.haulmont.testtask.ui.annotation.ToString;
+
 import java.lang.annotation.*;
 
 @Target({ElementType.FIELD})

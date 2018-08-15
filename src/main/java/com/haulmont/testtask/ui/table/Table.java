@@ -1,6 +1,7 @@
 package com.haulmont.testtask.ui.table;
 
 import com.haulmont.testtask.ui.annotation.ComponentName;
+import com.haulmont.testtask.ui.annotation.ToString;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.ui.Grid;
 import org.springframework.util.ReflectionUtils;

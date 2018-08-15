@@ -13,6 +13,7 @@ import com.vaadin.ui.*;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.util.ReflectionUtils;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,26 +26,13 @@ public class ModalEditorWindow<T> extends Window {
     private Map<String, Component> components;
     private Button acceptButton;
     private final Class type;
-    private T defaultItem;
-    private Binder<T> binder;
+    protected T defaultItem;
+    protected Binder<T> binder;
 
-    private Map<Class, CrudRepository<?, ?>> repositories = new HashMap<>();
-
-    public Map<Class, CrudRepository<?, ?>> getRepositories() {
-        return this.repositories;
-    }
-
-    public void setRepositories(
-            Map<Class, CrudRepository<?, ?>> repositories) {
-        this.repositories = repositories;
-    }
 
     public ModalEditorWindow(String label, Class<?> type, T defaultItem) {
         this(label, type);
-        if (null != defaultItem) {
-            this.binder.readBean(defaultItem);
-            this.defaultItem = defaultItem;
-        }
+        this.defaultItem = defaultItem;
     }
 
     public ModalEditorWindow(String label, Class<?> type) {
@@ -57,13 +45,14 @@ public class ModalEditorWindow<T> extends Window {
         setDraggable(false);
 
         setCaption(label);
+    }
 
-        Component[] actions = {
-                okButton(),
-                cancelButton()
-        };
-
-        setContent(renderComponents(buildComponents(type), actions));
+    @PostConstruct
+    public void init() {
+        setContent(renderComponents(buildComponents(), getActions()));
+        if (null != defaultItem) {
+            this.binder.readBean(defaultItem);
+        }
     }
 
     public void addAcceptListener(Button.ClickListener clickListener) {
@@ -78,62 +67,24 @@ public class ModalEditorWindow<T> extends Window {
         this.binder.writeBean(bean);
     }
 
-//    public T getItem() throws Exception {
-//        if (null == defaultItem) {
-//            defaultItem = (T) type.newInstance();
-//        }
-//
-//        for (String key : components.keySet()) {
-//            Field field = ReflectionUtils.findField(type, key);
-//            field.setAccessible(true);
-//            field.set(defaultItem, getValue(components.get(key)));
-//        }
-//
-//        return defaultItem;
-//    }
+    /**
+     * Задаем кнопкий действий
+     * @return
+     */
+    protected Component[] getActions() {
+        Component[] actions = new Component[]{
+                okButton(),
+                cancelButton()
+        };
+        addAcceptListener();
+        return actions;
+    }
 
-//    private void setDefaultValuesFromItem(T item) {
-//        for (String key : components.keySet()) {
-//            Field field = ReflectionUtils.findField(type, key);
-//            field.setAccessible(true);
-//            try {
-//                setValue(components.get(key), field.get(item));
-//            } catch (IllegalAccessException ignore) {
-//                ignore.printStackTrace();
-//            }
-//        }
-//    }
-
-//    @SuppressWarnings("unchecked")
-//    private void setValue(Component component, Object value) {
-//        if (null == value) {
-//            return;
-//        }
-//        if (component instanceof TextField) {
-//            ((TextField) component).setValue(String.valueOf(value));
-//        } else if (component instanceof ComboBox) {
-//            ((ComboBox) component).setValue(value);
-//        } else if (component instanceof DateField) {
-//            ((DateField) component).setValue(LocalDate.parse((CharSequence) value));
-//        } else if (component instanceof PhoneTextField) {
-//            ((PhoneTextField) component).setValue(String.valueOf(value));
-//        }
-//    }
-//
-//    private Object getValue(Component component) {
-//        if (component instanceof TextField) {
-//            return ((TextField) component).getValue();
-//        } else if (component instanceof ComboBox) {
-//            return ((ComboBox) component).getValue();
-//        } else if (component instanceof DateField) {
-//            return ((DateField) component).getValue();
-//        } else if (component instanceof PhoneTextField) {
-//            return ((PhoneTextField) component).getValue();
-//        }
-//        return null;
-//    }
-
-    private Component[] buildComponents(Class<?> type) {
+    /**
+     * Создаем компоненты для отрисовски в модальном окне
+     * @return
+     */
+    protected Component[] buildComponents() {
         List<Component> components = new ArrayList<>();
         for (Field field : type.getDeclaredFields()) {
             ComponentName componentName = field.getAnnotation(ComponentName.class);
@@ -160,6 +111,27 @@ public class ModalEditorWindow<T> extends Window {
         return components.toArray(new Component[0]);
     }
 
+    protected void addAcceptListener(){
+        acceptButton.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                try {
+                    writeBean(defaultItem);
+                } catch (ValidationException e) {
+                    e.printStackTrace();
+                }
+                close();
+            }
+        });
+    };
+
+    /**
+     * Создание компонента в зависимости от типа
+     * @param modalComponent
+     * @param fieldName
+     * @return
+     */
     private Component buildComponentByType(ModalComponent modalComponent, String fieldName) {
         switch (modalComponent.componentType()) {
             case DATE:
@@ -171,18 +143,6 @@ public class ModalEditorWindow<T> extends Window {
                 ComboBox comboBox = new ComboBox<>();
                 comboBox.setEmptySelectionAllowed(false);
                 binderOperation(comboBox, modalComponent);
-
-                try {
-                    if (!(modalComponent.object().isPrimitive())) {
-                        Object c = repositories.get(modalComponent.object());
-                        comboBox.setItems(
-                                ReflectionUtils.findMethod(c.getClass(), modalComponent.dataSource())
-                                        .invoke(c)
-                        );
-                    }
-                } catch (Exception ignore) {
-                }
-
                 binder.bind(comboBox, getter(fieldName, String.class), setter(fieldName, String.class));
                 return comboBox;
             case TEXT_FIELD:
@@ -204,10 +164,16 @@ public class ModalEditorWindow<T> extends Window {
         }
     }
 
+    /**
+     * Настройка биндера для поля
+     * @param hasValue
+     * @param modalComponent
+     */
     private void binderOperation(HasValue<?> hasValue, ModalComponent modalComponent) {
         hasValue.setReadOnly(!modalComponent.editable());
     }
 
+    //СОздание текстового поля чтоб не было дубля
     private TextField _buildTextField(String fieldName, ModalComponent modalComponent) {
         TextField textField = new TextField();
         binderOperation(textField, modalComponent);
@@ -215,6 +181,13 @@ public class ModalEditorWindow<T> extends Window {
         return textField;
     }
 
+    /**
+     * Геттер для объекта используемый в биндере
+     * @param fn
+     * @param type
+     * @param <TYPE>
+     * @return
+     */
     @SuppressWarnings("unchecked")
     private <TYPE> ValueProvider<T, TYPE> getter(String fn, Class<TYPE> type) {
         String fieldName = "get" + fn;
@@ -222,12 +195,25 @@ public class ModalEditorWindow<T> extends Window {
                 invokeMethod(ReflectionUtils.findMethod(t.getClass(), fieldName), t);
     }
 
+    /**
+     * Сеттер для объекта используемый в биндере
+     * @param fn
+     * @param type
+     * @param <TYPE>
+     * @return
+     */
     private <TYPE> Setter<T, TYPE> setter(String fn, Class<TYPE> type) {
         String fieldName = "set" + fn;
         return (Setter<T, TYPE>) (t, s) -> ReflectionUtils.
                 invokeMethod(ReflectionUtils.findMethod(t.getClass(), fieldName, s.getClass()), t, s);
     }
 
+    /**
+     * Прорисовка компонентов в окошке
+     * @param components
+     * @param actions
+     * @return
+     */
     private Component renderComponents(Component[] components, Component[] actions) {
         FormLayout layout = new FormLayout();
         layout.setMargin(new MarginInfo(true, true, false, true));
@@ -241,26 +227,22 @@ public class ModalEditorWindow<T> extends Window {
         return layout;
     }
 
+    /**
+     * Дефолтная кнопка "Отмена" и логика
+     * @return
+     */
     private Component cancelButton() {
         Button button = new Button("Отмена");
         button.addClickListener((Button.ClickListener) clickEvent -> close());
         return button;
     }
 
+    /**
+     * Дефолтная кнопка "Ок" и логика
+     * @return
+     */
     private Component okButton() {
         acceptButton = new Button("Ок");
-        acceptButton.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                try {
-                    writeBean(defaultItem);
-                } catch (ValidationException e) {
-                    e.printStackTrace();
-                }
-                close();
-            }
-        });
 
         return acceptButton;
     }

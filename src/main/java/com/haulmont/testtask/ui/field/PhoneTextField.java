@@ -1,20 +1,17 @@
 package com.haulmont.testtask.ui.field;
 
-
 import com.haulmont.testtask.ui.validation.NotEmptyFieldValidator;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.validator.RegexpValidator;
-import com.vaadin.shared.AbstractFieldState;
 import com.vaadin.shared.Registration;
 import com.vaadin.shared.ui.ValueChangeMode;
-import com.vaadin.shared.ui.gridlayout.GridLayoutState;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.TextField;
 
-public class PhoneTextField extends GridLayout implements HasValue<String>, AnotherField {
+public class PhoneTextField extends GridLayout implements HasValue<String> {
 
     private ComboBox<String> codeBox;
     private TextField phoneField;

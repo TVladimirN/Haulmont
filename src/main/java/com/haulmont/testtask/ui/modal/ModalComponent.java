@@ -1,5 +1,7 @@
 package com.haulmont.testtask.ui.modal;
 
+import com.haulmont.testtask.ui.annotation.ToString;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -24,6 +26,8 @@ public @interface ModalComponent {
     String dataSource() default "";
 
     Class object() default Void.class;
+
+    ToString string() default @ToString();
 
     enum Type {
         TEXT_FIELD,

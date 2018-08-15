@@ -1,5 +1,6 @@
 package com.haulmont.testtask.ui;
 
+import com.haulmont.testtask.ui.table.recipe.RecipeTable;
 import com.vaadin.navigator.View;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.spring.annotation.UIScope;
@@ -15,7 +16,8 @@ import javax.annotation.PostConstruct;
 public class Tabs extends TabSheet implements View {
 
     @Autowired
-    private RecipesTab recipesTab;
+    private RecipeTable recipeTable;
+//    private RecipesTab recipesTab;
 
     @Autowired
     @Qualifier("patientsTable")
@@ -25,9 +27,9 @@ public class Tabs extends TabSheet implements View {
     @Qualifier("doctorsTable")
     private Component doctorsTable;
 
-    @Autowired
-    @Qualifier("recipesTable")
-    private Component recipesTable;
+//    @Autowired
+//    @Qualifier("recipesTable")
+//    private Component recipesTable;
 
 //    @Autowired
 //    private CrudService crudService;
@@ -36,7 +38,7 @@ public class Tabs extends TabSheet implements View {
     void init() {
         addTab(patientsTable);
         addTab(doctorsTable);
-        addTab(recipesTable);
+        addTab(recipeTable);
     }
 
 }

@@ -1,16 +1,12 @@
 package com.haulmont.testtask.ui;
 
-import com.haulmont.testtask.ui.field.PhoneTextField;
-import com.haulmont.testtask.ui.modal.ModalEditorWindow;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.spring.annotation.EnableVaadin;
 import com.vaadin.spring.annotation.SpringUI;
-import com.vaadin.ui.*;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static com.haulmont.testtask.utils.ComponentUtil.buildTextField;
 
 @Theme(ValoTheme.THEME_NAME)
 @SpringUI(path = "/")
@@ -33,21 +29,6 @@ public class MainUI extends UI {
         layout.addComponent(tabs);
 
         setContent(layout);
-
-
-//        addWindow(
-//                new ModalEditorWindow(
-//                        "Добавление нового пользователя",
-//                        new Component[]{
-//                                buildTextField("Имя"),
-//                                buildTextField("Фамилия"),
-//                                buildTextField("Отчество"),
-//                                new PhoneTextField()
-////                                gridLayout
-//                        }
-//
-//                )
-//        );
     }
 
 }

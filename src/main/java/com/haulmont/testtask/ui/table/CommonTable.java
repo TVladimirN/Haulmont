@@ -1,5 +1,6 @@
 package com.haulmont.testtask.ui.table;
 
+import com.haulmont.testtask.spring.RepositoryService;
 import com.haulmont.testtask.ui.modal.ModalEditorWindow;
 import com.vaadin.navigator.View;
 import com.vaadin.ui.*;
@@ -9,20 +10,16 @@ import org.springframework.data.repository.CrudRepository;
 import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 public class CommonTable<ITEM> extends VerticalLayout implements View {
 
-    private CrudRepository<ITEM, Long> repository;
-
-    public void setRepository(CrudRepository repository) {
-        this.repository = repository;
-    }
+    protected CrudRepository<ITEM, ?> repository;
+    protected RepositoryService repositoryService;
 
     private Button edit = new Button("Изменить");
     private Button remove = new Button("Удалить");
     private Button add = new Button("Добавить");
-    private Table<ITEM> table;
+    protected Table<ITEM> table;
 
     private ITEM itemSelected;
     Class<ITEM> type;
@@ -77,9 +74,22 @@ public class CommonTable<ITEM> extends VerticalLayout implements View {
         table.setItems(new HashSet<>((Collection<? extends ITEM>) repository.findAll()));
     }
 
-    private void openModalEditorWindow(ITEM item) {
+    public void setRepository(CrudRepository<ITEM, ?> repository) {
+        this.repository = repository;
+    }
+
+    public void setRepositoryService(RepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
+    }
+
+    protected ModalEditorWindow<ITEM> createModalEditorWindow(ITEM item) {
         ModalEditorWindow<ITEM> modalEditorWindow =
                 new ModalEditorWindow<>("Редактирование пациента", type, item);
+        modalEditorWindow.init();
+        return modalEditorWindow;
+    }
+
+    protected void createAcceptListener(ModalEditorWindow<ITEM> modalEditorWindow, ITEM item) {
         modalEditorWindow.addAcceptListener(
                 clickEvent -> {
                     try {
@@ -92,6 +102,11 @@ public class CommonTable<ITEM> extends VerticalLayout implements View {
                     }
                 }
         );
+    }
+
+    private void openModalEditorWindow(ITEM item) {
+        ModalEditorWindow<ITEM> modalEditorWindow = createModalEditorWindow(item);
+        createAcceptListener(modalEditorWindow, item);
         UI.getCurrent().addWindow(modalEditorWindow);
     }
 

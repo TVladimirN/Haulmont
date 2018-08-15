@@ -1,4 +1,4 @@
-package com.haulmont.testtask.ui.table;
+package com.haulmont.testtask.ui.annotation;
 
 public @interface ToString {
 

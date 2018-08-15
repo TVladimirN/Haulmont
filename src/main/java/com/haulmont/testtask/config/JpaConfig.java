@@ -20,18 +20,10 @@ import java.sql.SQLException;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories("com.haulmont.testtask.repository")
+@EnableJpaRepositories(
+        basePackages = "com.haulmont.testtask.repository"
+)
 public class JpaConfig {
-
-//    @Autowired
-//    private BeanFactory beanFactory;
-//
-//    @PostConstruct
-//    public void crudService(){
-//        RootBeanDefinition rootBeanDefinition = new RootBeanDefinition(CrudService.class);
-//        rootBeanDefinition.setAbstract(true);
-//        ((DefaultListableBeanFactory) beanFactory).registerBeanDefinition("crudService", rootBeanDefinition);
-//    }
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
