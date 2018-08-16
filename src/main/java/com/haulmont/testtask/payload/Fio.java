@@ -1,7 +1,5 @@
 package com.haulmont.testtask.payload;
 
-import org.springframework.util.ObjectUtils;
-
 import java.util.Objects;
 
 public class Fio {

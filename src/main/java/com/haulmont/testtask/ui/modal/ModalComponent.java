@@ -21,20 +21,14 @@ public @interface ModalComponent {
      * Тип компонента в отрисовке
      * @return
      */
-    Type componentType() default Type.TEXT_FIELD;
+    ComponentType componentType() default ComponentType.TEXT_FIELD;
+
+    boolean isRequire() default false;
 
     String dataSource() default "";
 
     Class object() default Void.class;
 
     ToString string() default @ToString();
-
-    enum Type {
-        TEXT_FIELD,
-        TEXT_AREA,
-        PHONE_FIELD,
-        COMBO_BOX,
-        DATE
-    }
 
 }

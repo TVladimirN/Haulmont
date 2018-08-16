@@ -22,7 +22,7 @@ public class CommonTable<ITEM> extends VerticalLayout implements View {
     protected Table<ITEM> table;
 
     private ITEM itemSelected;
-    Class<ITEM> type;
+    private Class<ITEM> type;
 
     public CommonTable(Class<ITEM> type) {
         this.type = type;
@@ -34,9 +34,9 @@ public class CommonTable<ITEM> extends VerticalLayout implements View {
         this.edit.setEnabled(false);
         this.remove.setEnabled(false);
 
-        addComponent(table);
+        addComponent(this.table);
 
-        table.addItemClickListener(itemClickEvent -> {
+        this.table.addItemClickListener(itemClickEvent -> {
             this.edit.setEnabled(true);
             this.remove.setEnabled(true);
             this.itemSelected = itemClickEvent.getItem();
@@ -45,19 +45,19 @@ public class CommonTable<ITEM> extends VerticalLayout implements View {
         GridLayout gridLayout = new GridLayout(3, 1);
         gridLayout.setSpacing(true);
 
-        gridLayout.addComponent(add);
-        add.addClickListener(clickEvent -> openModalEditorWindow(createInstanceItem()));
+        gridLayout.addComponent(this.add);
+        this.add.addClickListener(clickEvent -> openModalEditorWindow(createInstanceItem()));
 
-        gridLayout.addComponent(edit);
-        edit.addClickListener(clickEvent -> {
-            openModalEditorWindow(itemSelected);
+        gridLayout.addComponent(this.edit);
+        this.edit.addClickListener(clickEvent -> {
+            openModalEditorWindow(this.itemSelected);
         });
 
-        gridLayout.addComponent(remove);
-        remove.addClickListener(clickEvent -> {
+        gridLayout.addComponent(this.remove);
+        this.remove.addClickListener(clickEvent -> {
             try {
-                repository.delete(itemSelected);
-                this.table.setItems(new HashSet<>((Collection<? extends ITEM>) repository.findAll()));
+                this.repository.delete(itemSelected);
+                this.table.setItems(new HashSet<>((Collection<? extends ITEM>) this.repository.findAll()));
                 this.edit.setEnabled(false);
                 this.remove.setEnabled(false);
             } catch (DataIntegrityViolationException e) {
@@ -71,7 +71,7 @@ public class CommonTable<ITEM> extends VerticalLayout implements View {
 
         addComponent(gridLayout);
 
-        table.setItems(new HashSet<>((Collection<? extends ITEM>) repository.findAll()));
+        this.table.setItems(new HashSet<>((Collection<? extends ITEM>) this.repository.findAll()));
     }
 
     public void setRepository(CrudRepository<ITEM, ?> repository) {
@@ -84,7 +84,7 @@ public class CommonTable<ITEM> extends VerticalLayout implements View {
 
     protected ModalEditorWindow<ITEM> createModalEditorWindow(ITEM item) {
         ModalEditorWindow<ITEM> modalEditorWindow =
-                new ModalEditorWindow<>("Редактирование пациента", type, item);
+                new ModalEditorWindow<>("Редактирование пациента", this.type, item);
         modalEditorWindow.init();
         return modalEditorWindow;
     }
@@ -93,8 +93,8 @@ public class CommonTable<ITEM> extends VerticalLayout implements View {
         modalEditorWindow.addAcceptListener(
                 clickEvent -> {
                     try {
-                        repository.save(item);
-                        table.setItems(new HashSet<>((Collection<? extends ITEM>) repository.findAll()));
+                        this.repository.save(item);
+                        this.table.setItems(new HashSet<>((Collection<? extends ITEM>) this.repository.findAll()));
                         this.edit.setEnabled(false);
                         this.remove.setEnabled(false);
                     } catch (Exception e) {

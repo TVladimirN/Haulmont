@@ -5,9 +5,10 @@ import com.haulmont.testtask.converter.LocalDateConverter;
 import com.haulmont.testtask.payload.RecipePriority;
 import com.haulmont.testtask.repository.PatientRepository;
 import com.haulmont.testtask.ui.annotation.ComponentName;
+import com.haulmont.testtask.ui.annotation.ToString;
+import com.haulmont.testtask.ui.modal.ComponentType;
 import com.haulmont.testtask.ui.modal.ModalComponent;
 import com.haulmont.testtask.ui.table.TableComponent;
-import com.haulmont.testtask.ui.annotation.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -29,7 +30,7 @@ public class RecipeDAO implements Serializable {
     @Column(name = "description", nullable = false)
     @ComponentName("Описание")
     @TableComponent(order = 1, render = true)
-    @ModalComponent(componentType = ModalComponent.Type.TEXT_AREA)
+//    @ModalComponent(componentType = ComponentType.TEXT_AREA)
     private String description;
 
     @ManyToOne(optional = false, targetEntity = PatientDAO.class)
@@ -37,11 +38,11 @@ public class RecipeDAO implements Serializable {
     @ComponentName("Пациент")
     @TableComponent(order = 2, render = true,
             string = @ToString(parameter = {"getFirstName", "getMiddleName", "getLastName"}))
-    @ModalComponent(
-            componentType = ModalComponent.Type.COMBO_BOX,
-            object = PatientRepository.class,
-            dataSource = "findAll",
-            string = @ToString(parameter = {"getFirstName", "getMiddleName", "getLastName"}))
+//    @ModalComponent(
+//            componentType = ComponentType.COMBO_BOX,
+//            object = PatientRepository.class,
+//            dataSource = "findAll",
+//            string = @ToString(parameter = {"getFirstName", "getMiddleName", "getLastName"}))
     private PatientDAO patient;
 
     @ManyToOne(optional = false, targetEntity = DoctorDAO.class)
@@ -49,27 +50,27 @@ public class RecipeDAO implements Serializable {
     @ComponentName("Врач")
     @TableComponent(order = 3, render = true,
             string = @ToString(parameter = {"getFirstName", "getMiddleName", "getLastName"}))
-    @ModalComponent//(componentType = ModalComponent.Type.COMBO_BOX)
+    //@ModalComponent//(componentType = ModalComponent.Type.COMBO_BOX)
     private DoctorDAO doctor;
 
     @Column(name = "date_create", nullable = false)
     @ComponentName("Дата создания")
     @TableComponent(order = 4, render = true)
-    @ModalComponent(componentType = ModalComponent.Type.DATE)
+    //@ModalComponent(componentType = ComponentType.DATE)
     @Convert(converter = LocalDateConverter.class)
     private LocalDate dateCreate;
 
     @Column(name = "duration", nullable = false)
     @ComponentName("Срок действия")
     @TableComponent(order = 5, render = true)
-    @ModalComponent(componentType = ModalComponent.Type.DATE)
+    //@ModalComponent(componentType = ComponentType.DATE, isRequire = true)
     @Convert(converter = LocalDateConverter.class)
     private LocalDate duration;
 
     @Column(name = "priority", nullable = false)
     @ComponentName("Приоритет")
     @TableComponent(order = 6, render = true)
-    @ModalComponent//(componentType = ModalComponent.Type.COMBO_BOX)
+    //@ModalComponent(componentType = ModalComponent.Type.COMBO_BOX)
     private RecipePriority priority;
 
     public Long getId() {
@@ -132,19 +133,12 @@ public class RecipeDAO implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof RecipeDAO)) return false;
-        RecipeDAO that = (RecipeDAO) o;
-        return Objects.equals(getId(), that.getId()) &&
-                Objects.equals(description, that.description) &&
-                Objects.equals(patient, that.patient) &&
-                Objects.equals(doctor, that.doctor) &&
-                Objects.equals(dateCreate, that.dateCreate) &&
-                Objects.equals(duration, that.duration) &&
-                priority == that.priority;
+        RecipeDAO recipeDAO = (RecipeDAO) o;
+        return Objects.equals(getId(), recipeDAO.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), description, patient, doctor, dateCreate, duration, priority);
+        return Objects.hash(getId());
     }
-
 }

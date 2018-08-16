@@ -1,6 +1,7 @@
 package com.haulmont.testtask.payload.dao;
 
 import com.haulmont.testtask.ui.annotation.ComponentName;
+import com.haulmont.testtask.ui.modal.ComponentType;
 import com.haulmont.testtask.ui.modal.ModalComponent;
 import com.haulmont.testtask.ui.table.TableComponent;
 
@@ -19,25 +20,29 @@ public class DoctorDAO implements Serializable {
     @ComponentName("id")
     @TableComponent(order = 0, render = false)
     private Long id;
+
     @Column(name = "first_name", nullable = false)
     @ComponentName("Фамилия")
     @TableComponent(order = 1, render = true)
-    @ModalComponent
+    @ModalComponent(isRequire = true, componentType = ComponentType.TEXT_FIELD_WORLD)
     private String firstName;
+
     @Column(name = "middle_name", nullable = false)
     @ComponentName("Имя")
     @TableComponent(order = 2, render = true)
-    @ModalComponent
+    @ModalComponent(isRequire = true, componentType = ComponentType.TEXT_FIELD_WORLD)
     private String middleName;
+
     @Column(name = "last_name", nullable = false)
     @ComponentName("Отчество")
     @TableComponent(order = 3, render = true)
-    @ModalComponent
+    @ModalComponent(isRequire = true, componentType = ComponentType.TEXT_FIELD_WORLD)
     private String lastName;
+
     @Column(nullable = false)
     @ComponentName("Специализация")
     @TableComponent(order = 4, render = true)
-    @ModalComponent
+    @ModalComponent(isRequire = true, componentType = ComponentType.TEXT_FIELD_WORLD)
     private String specialization;
 
     public Long getId() {

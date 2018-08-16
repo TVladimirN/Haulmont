@@ -1,8 +1,9 @@
 package com.haulmont.testtask.ui.modal;
 
-import com.haulmont.testtask.payload.dao.PatientDAO;
 import com.haulmont.testtask.ui.annotation.ComponentName;
+import com.haulmont.testtask.ui.field.NumberTextField;
 import com.haulmont.testtask.ui.field.PhoneTextField;
+import com.haulmont.testtask.ui.field.WorldTextField;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.ValidationException;
@@ -10,7 +11,6 @@ import com.vaadin.data.ValueProvider;
 import com.vaadin.server.Setter;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.util.ReflectionUtils;
 
 import javax.annotation.PostConstruct;
@@ -30,12 +30,12 @@ public class ModalEditorWindow<T> extends Window {
     protected Binder<T> binder;
 
 
+    /**
+     * @param label       - Заголовок окна
+     * @param type        - тип объекта
+     * @param defaultItem - дефолтный объект, не может быть null
+     */
     public ModalEditorWindow(String label, Class<?> type, T defaultItem) {
-        this(label, type);
-        this.defaultItem = defaultItem;
-    }
-
-    public ModalEditorWindow(String label, Class<?> type) {
         this.binder = new Binder<>();
         this.type = type;
         this.components = new HashMap<>();
@@ -45,14 +45,15 @@ public class ModalEditorWindow<T> extends Window {
         setDraggable(false);
 
         setCaption(label);
+
+        this.defaultItem = defaultItem;
     }
 
     @PostConstruct
     public void init() {
         setContent(renderComponents(buildComponents(), getActions()));
-        if (null != defaultItem) {
-            this.binder.readBean(defaultItem);
-        }
+        this.binder.readBean(this.defaultItem);
+        binder.validate();
     }
 
     public void addAcceptListener(Button.ClickListener clickListener) {
@@ -61,6 +62,7 @@ public class ModalEditorWindow<T> extends Window {
 
     public void readBean(T bean) {
         this.binder.readBean(bean);
+        binder.validate();
     }
 
     public void writeBean(T bean) throws ValidationException {
@@ -86,7 +88,7 @@ public class ModalEditorWindow<T> extends Window {
      */
     protected Component[] buildComponents() {
         List<Component> components = new ArrayList<>();
-        for (Field field : type.getDeclaredFields()) {
+        for (Field field : this.type.getDeclaredFields()) {
             ComponentName componentName = field.getAnnotation(ComponentName.class);
             if (null == componentName) {
                 continue;
@@ -111,20 +113,16 @@ public class ModalEditorWindow<T> extends Window {
         return components.toArray(new Component[0]);
     }
 
-    protected void addAcceptListener(){
-        acceptButton.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                try {
-                    writeBean(defaultItem);
-                } catch (ValidationException e) {
-                    e.printStackTrace();
-                }
-                close();
+    protected void addAcceptListener() {
+        this.acceptButton.addClickListener((Button.ClickListener) clickEvent -> {
+            try {
+                writeBean(this.defaultItem);
+            } catch (ValidationException e) {
+                e.printStackTrace();
             }
+            close();
         });
-    };
+    }
 
     /**
      * Создание компонента в зависимости от типа
@@ -136,28 +134,34 @@ public class ModalEditorWindow<T> extends Window {
         switch (modalComponent.componentType()) {
             case DATE:
                 DateField dateField = new DateField();
-                binderOperation(dateField, modalComponent);
-                binder.bind(dateField, getter(fieldName, LocalDate.class), setter(fieldName, LocalDate.class));
+                binderOperation(dateField, modalComponent, LocalDate.class)
+                        .bind(getter(fieldName, LocalDate.class), setter(fieldName, LocalDate.class));
                 return dateField;
             case COMBO_BOX:
-                ComboBox comboBox = new ComboBox<>();
+                ComboBox<String> comboBox = new ComboBox<>();
                 comboBox.setEmptySelectionAllowed(false);
-                binderOperation(comboBox, modalComponent);
-                binder.bind(comboBox, getter(fieldName, String.class), setter(fieldName, String.class));
+                binderOperation(comboBox, modalComponent, String.class)
+                        .bind(getter(fieldName, String.class), setter(fieldName, String.class));
                 return comboBox;
-            case TEXT_FIELD:
-                return _buildTextField(fieldName, modalComponent);
+            case TEXT_FIELD_WORLD:
+                WorldTextField worldField = new WorldTextField();
+                binderOperation(worldField, modalComponent, String.class)
+                        .bind(getter(fieldName, String.class), setter(fieldName, String.class));
+                return worldField;
+            case TEXT_FIELD_NUMBER:
+                NumberTextField numberField = new NumberTextField();
+                return numberField;
             case PHONE_FIELD:
                 PhoneTextField phoneTextField = new PhoneTextField();
-                binderOperation(phoneTextField, modalComponent);
-                binder.bind(phoneTextField, getter(fieldName, String.class), setter(fieldName, String.class));
+                binderOperation(phoneTextField, modalComponent, String.class)
+                        .bind(getter(fieldName, String.class), setter(fieldName, String.class));
                 return phoneTextField;
             case TEXT_AREA:
                 TextArea textArea = new TextArea();
                 textArea.setRows(3);
                 textArea.setMaxLength(255);
-                binderOperation(textArea, modalComponent);
-                binder.bind(textArea, getter(fieldName, String.class), setter(fieldName, String.class));
+                binderOperation(textArea, modalComponent, String.class)
+                        .bind(getter(fieldName, String.class), setter(fieldName, String.class));
                 return textArea;
             default:
                 return _buildTextField(fieldName, modalComponent);
@@ -169,15 +173,20 @@ public class ModalEditorWindow<T> extends Window {
      * @param hasValue
      * @param modalComponent
      */
-    private void binderOperation(HasValue<?> hasValue, ModalComponent modalComponent) {
+    private <TYPE> Binder.BindingBuilder<T, TYPE> binderOperation(HasValue<TYPE> hasValue,
+                                                                  ModalComponent modalComponent, Class<TYPE> type) {
+        Binder.BindingBuilder<T, TYPE> builder = binder.forField(hasValue);
         hasValue.setReadOnly(!modalComponent.editable());
+        if (modalComponent.isRequire()) {
+            builder.asRequired("Поле, не может быть пустым!");
+        }
+        return builder;
     }
 
-    //СОздание текстового поля чтоб не было дубля
     private TextField _buildTextField(String fieldName, ModalComponent modalComponent) {
         TextField textField = new TextField();
-        binderOperation(textField, modalComponent);
-        binder.bind(textField, getter(fieldName, String.class), setter(fieldName, String.class));
+        binderOperation(textField, modalComponent, String.class)
+                .bind(getter(fieldName, String.class), setter(fieldName, String.class));
         return textField;
     }
 
@@ -242,9 +251,9 @@ public class ModalEditorWindow<T> extends Window {
      * @return
      */
     private Component okButton() {
-        acceptButton = new Button("Ок");
+        this.acceptButton = new Button("Ок");
 
-        return acceptButton;
+        return this.acceptButton;
     }
 
 }

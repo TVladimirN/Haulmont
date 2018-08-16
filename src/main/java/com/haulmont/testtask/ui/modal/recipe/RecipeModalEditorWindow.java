@@ -25,14 +25,6 @@ public class RecipeModalEditorWindow extends ModalEditorWindow<RecipeDAO> {
         this.repositoryService = repositoryService;
     }
 
-    public RecipeModalEditorWindow(String label, RecipeDAO defaultItem) {
-        super(label, RecipeDAO.class, defaultItem);
-    }
-
-    public RecipeModalEditorWindow(String label) {
-        super(label, RecipeDAO.class);
-    }
-
     @Override
     protected Component[] buildComponents() {
         return new Component[]{
@@ -51,7 +43,9 @@ public class RecipeModalEditorWindow extends ModalEditorWindow<RecipeDAO> {
         descriptionArea.setRows(4);
         descriptionArea.setWidth("350");
 
-        binder.bind(descriptionArea, RecipeDAO::getDescription, RecipeDAO::setDescription);
+        binder.forField(descriptionArea)
+                .asRequired("Описание не может быть пустым")
+                .bind(RecipeDAO::getDescription, RecipeDAO::setDescription);
 
         return descriptionArea;
     }
@@ -68,21 +62,22 @@ public class RecipeModalEditorWindow extends ModalEditorWindow<RecipeDAO> {
                                 d -> d
                         )
                 );
-        binder.bind(
-                patientBox,
-                recipeDAO -> {
-                    PatientDAO doctor = recipeDAO.getPatient();
-                    if (null == doctor) {
-                        return Fio.empty();
-                    }
-                    return new Fio(
-                            doctor.getFirstName(),
-                            doctor.getMiddleName(),
-                            doctor.getLastName()
-                    );
-                },
-                (recipeDAO, s) -> recipeDAO.setPatient(map.get(s))
-        );
+        binder.forField(patientBox)
+                .asRequired("Выберите пациента")
+                .bind(
+                        recipeDAO -> {
+                            PatientDAO doctor = recipeDAO.getPatient();
+                            if (null == doctor) {
+                                return Fio.empty();
+                            }
+                            return new Fio(
+                                    doctor.getFirstName(),
+                                    doctor.getMiddleName(),
+                                    doctor.getLastName()
+                            );
+                        },
+                        (recipeDAO, s) -> recipeDAO.setPatient(map.get(s))
+                );
         patientBox.setItems(map.keySet());
         return patientBox;
     }
@@ -99,21 +94,22 @@ public class RecipeModalEditorWindow extends ModalEditorWindow<RecipeDAO> {
                                 d -> d
                         )
                 );
-        binder.bind(
-                doctorBox,
-                recipeDAO -> {
-                    DoctorDAO doctor = recipeDAO.getDoctor();
-                    if (null == doctor) {
-                        return Fio.empty();
-                    }
-                    return new Fio(
-                            doctor.getFirstName(),
-                            doctor.getMiddleName(),
-                            doctor.getLastName()
-                    );
-                },
-                (recipeDAO, s) -> recipeDAO.setDoctor(map.get(s))
-        );
+        binder.forField(doctorBox)
+                .asRequired("Выберите врача")
+                .bind(
+                        recipeDAO -> {
+                            DoctorDAO doctor = recipeDAO.getDoctor();
+                            if (null == doctor) {
+                                return Fio.empty();
+                            }
+                            return new Fio(
+                                    doctor.getFirstName(),
+                                    doctor.getMiddleName(),
+                                    doctor.getLastName()
+                            );
+                        },
+                        (recipeDAO, s) -> recipeDAO.setDoctor(map.get(s))
+                );
         doctorBox.setItems(map.keySet());
         return doctorBox;
     }
@@ -121,9 +117,15 @@ public class RecipeModalEditorWindow extends ModalEditorWindow<RecipeDAO> {
     private Component createDate() {
         DateField dateField = new DateField("Время создания");
         dateField.setTextFieldEnabled(false);
-        dateField.setValue(LocalDate.now());
 
-        binder.bind(dateField, RecipeDAO::getDateCreate, RecipeDAO::setDateCreate);
+        binder.forField(dateField)
+                .asRequired()
+                .bind(recipeDAO -> {
+                    if (null == recipeDAO.getDateCreate()) {
+                        return LocalDate.now();
+                    }
+                    return recipeDAO.getDateCreate();
+                }, RecipeDAO::setDateCreate);
 
         return dateField;
     }
@@ -131,9 +133,10 @@ public class RecipeModalEditorWindow extends ModalEditorWindow<RecipeDAO> {
     private Component durationDate() {
         DateField dateField = new DateField("Срок действия");
         dateField.setTextFieldEnabled(false);
-        dateField.setValue(LocalDate.now().plusDays(1));
 
-        binder.bind(dateField, RecipeDAO::getDuration, RecipeDAO::setDuration);
+        binder.forField(dateField)
+                .asRequired("Срок действия рецепта не может быть пустым")
+                .bind(RecipeDAO::getDuration, RecipeDAO::setDuration);
 
         return dateField;
     }
@@ -144,7 +147,9 @@ public class RecipeModalEditorWindow extends ModalEditorWindow<RecipeDAO> {
         priorityBox.setEmptySelectionAllowed(false);
         priorityBox.setItems(RecipePriority.values());
 
-        binder.bind(priorityBox, RecipeDAO::getPriority, RecipeDAO::setPriority);
+        binder.forField(priorityBox)
+                .asRequired("Выберите приоритет")
+                .bind(RecipeDAO::getPriority, RecipeDAO::setPriority);
 
         return priorityBox;
     }

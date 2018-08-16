@@ -5,7 +5,6 @@ import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
 import com.vaadin.data.validator.RegexpValidator;
 import com.vaadin.shared.Registration;
-import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
@@ -75,7 +74,6 @@ public class PhoneTextField extends GridLayout implements HasValue<String> {
         codeBox.setEmptySelectionAllowed(false);
         //для примера
         codeBox.setItems("+7", "+1", "+13");
-        codeBox.setDescription("Для примера выбора кода, если не зашиваться на России.");
         //
 
         new Binder<String>().forField(codeBox)
@@ -88,7 +86,7 @@ public class PhoneTextField extends GridLayout implements HasValue<String> {
 
     private Component phoneField() {
 
-        phoneField = new TextField();
+        phoneField = new NumberTextField();
 
         new Binder<String>().forField(phoneField)
                 .asRequired(
@@ -99,18 +97,12 @@ public class PhoneTextField extends GridLayout implements HasValue<String> {
                         "Введен неверный номер телефона! (от 10 до 13 цифр)",
                         "\\+?[0-9]{10,13}", true
                 ))
-                .withNullRepresentation("(000)0000000")
                 .bind(s -> s, (s, s1) -> s = s1)
                 .validate();
 
         phoneField.setDescription("без восмерки");
         phoneField.setMaxLength(13);
 
-        phoneField.setValueChangeMode(ValueChangeMode.EAGER);
-        phoneField.addValueChangeListener(textChangeEvent -> {
-            (textChangeEvent.getSource())
-                    .setValue(textChangeEvent.getValue().replaceAll("[a-zA-Z]?[^0-9]", ""));
-        });
         return phoneField;
     }
 

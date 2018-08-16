@@ -22,7 +22,7 @@ public class RepositoryEntityBeanPostProcessor implements BeanPostProcessor {
         if (bean instanceof JpaRepositoryFactoryBean) {
             Class<?> c = ((JpaMetamodelEntityInformation) ((JpaRepositoryFactoryBean) bean)
                     .getEntityInformation()).getIdAttribute().getJavaMember().getDeclaringClass();
-            repositoryService.addRepository(c, (MyRepository)((JpaRepositoryFactoryBean) bean).getObject());
+            repositoryService.addRepository(c, (MyRepository) ((JpaRepositoryFactoryBean) bean).getObject());
         }
         return bean;
     }
