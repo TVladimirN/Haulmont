@@ -18,7 +18,7 @@ public class WorldTextField extends TextField {
     private void setChangeListener() {
         setValueChangeMode(ValueChangeMode.EAGER);
         addValueChangeListener(
-                event -> doSetValue(event.getValue().replaceAll("[[^А-яA-z]\\W_]+?", ""))
+                event -> doSetValue(event.getValue().replaceAll("[[^а-яА-яa-zA-Z]_]+", ""))
         );
     }
 

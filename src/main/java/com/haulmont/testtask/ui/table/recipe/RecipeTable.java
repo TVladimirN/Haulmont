@@ -2,9 +2,10 @@ package com.haulmont.testtask.ui.table.recipe;
 
 import com.haulmont.testtask.payload.dao.RecipeDAO;
 import com.haulmont.testtask.repository.RecipeRepository;
+import com.haulmont.testtask.ui.field.WorldTextField;
 import com.haulmont.testtask.ui.modal.recipe.RecipeModalEditorWindow;
 import com.haulmont.testtask.ui.table.CommonTable;
-import com.vaadin.data.HasValue;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.TextField;
 
@@ -31,11 +32,10 @@ public class RecipeTable extends CommonTable<RecipeDAO> {
 
     private void renderSearchBar() {
         this.searchBarDescription = new TextField("Описание");
-        this.searchBarDescription.addValueChangeListener(buildSearchBarListener());
-        this.searchBarDoctor = new TextField("Врач");
-        this.searchBarDoctor.addValueChangeListener(buildSearchBarListener());
-        this.searchBarPatient = new TextField("Пациент");
-        this.searchBarPatient.addValueChangeListener(buildSearchBarListener());
+        this.searchBarDoctor = new WorldTextField("Врач");
+        this.searchBarPatient = new WorldTextField("Пациент");
+        Button searchButton = new Button("Поиск");
+        searchButton.addClickListener(buildSearchBarListener());
 
         GridLayout gridLayoutFilter = new GridLayout(3, 1);
         gridLayoutFilter.setSpacing(true);
@@ -43,12 +43,14 @@ public class RecipeTable extends CommonTable<RecipeDAO> {
         gridLayoutFilter.addComponent(this.searchBarDescription);
         gridLayoutFilter.addComponent(this.searchBarPatient);
         gridLayoutFilter.addComponent(this.searchBarDoctor);
+        gridLayoutFilter.addComponent(searchButton);
 
         addComponent(gridLayoutFilter);
     }
 
-    private HasValue.ValueChangeListener<String> buildSearchBarListener() {
-        return (HasValue.ValueChangeListener<String>) valueChangeEvent -> {
+
+    private Button.ClickListener buildSearchBarListener() {
+        return (Button.ClickListener) event -> {
             String desc = searchBarDescription.getValue().isEmpty()
                     ? "%"
                     : "%" + searchBarDescription.getValue() + "%";

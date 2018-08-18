@@ -21,7 +21,7 @@ public class CommonTable<ITEM> extends VerticalLayout implements View {
     private Button add = new Button("Добавить");
     protected Table<ITEM> table;
 
-    private ITEM itemSelected;
+    protected ITEM itemSelected;
     private Class<ITEM> type;
 
     public CommonTable(Class<ITEM> type) {
@@ -42,7 +42,8 @@ public class CommonTable<ITEM> extends VerticalLayout implements View {
             this.itemSelected = itemClickEvent.getItem();
         });
 
-        GridLayout gridLayout = new GridLayout(3, 1);
+        Component[] components = addAdditionalActionButtons();
+        GridLayout gridLayout = new GridLayout(3 + components.length, 1);
         gridLayout.setSpacing(true);
 
         gridLayout.addComponent(this.add);
@@ -68,6 +69,8 @@ public class CommonTable<ITEM> extends VerticalLayout implements View {
             }
         });
 
+        gridLayout.addComponents(components);
+
 
         addComponent(gridLayout);
 
@@ -80,6 +83,10 @@ public class CommonTable<ITEM> extends VerticalLayout implements View {
 
     public void setRepositoryService(RepositoryService repositoryService) {
         this.repositoryService = repositoryService;
+    }
+
+    protected Component[] addAdditionalActionButtons() {
+        return new Component[0];
     }
 
     protected ModalEditorWindow<ITEM> createModalEditorWindow(ITEM item) {

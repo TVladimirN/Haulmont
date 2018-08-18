@@ -3,11 +3,8 @@ package com.haulmont.testtask.payload.dao;
 
 import com.haulmont.testtask.converter.LocalDateConverter;
 import com.haulmont.testtask.payload.RecipePriority;
-import com.haulmont.testtask.repository.PatientRepository;
 import com.haulmont.testtask.ui.annotation.ComponentName;
 import com.haulmont.testtask.ui.annotation.ToString;
-import com.haulmont.testtask.ui.modal.ComponentType;
-import com.haulmont.testtask.ui.modal.ModalComponent;
 import com.haulmont.testtask.ui.table.TableComponent;
 
 import javax.persistence.*;

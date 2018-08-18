@@ -2,8 +2,10 @@ package com.haulmont.testtask.config;
 
 import com.haulmont.testtask.payload.dao.DoctorDAO;
 import com.haulmont.testtask.payload.dao.PatientDAO;
+import com.haulmont.testtask.payload.dao.RecipeDAO;
 import com.haulmont.testtask.spring.RepositoryService;
 import com.haulmont.testtask.ui.table.CommonTable;
+import com.haulmont.testtask.ui.table.doctor.DoctorTable;
 import com.haulmont.testtask.ui.table.recipe.RecipeTable;
 import com.vaadin.ui.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +18,18 @@ import org.springframework.data.repository.CrudRepository;
 public class UiConfig {
 
     @Bean("patientsTable")
-    public Component patientsTable(@Autowired @Qualifier("patientRepository") CrudRepository repository) {
-        CommonTable commonTable = new CommonTable<>(PatientDAO.class);
+    public Component patientsTable(
+            @Autowired @Qualifier("patientRepository") CrudRepository<PatientDAO, Long> repository) {
+        CommonTable<PatientDAO> commonTable = new CommonTable<>(PatientDAO.class);
         commonTable.setCaption("Пациенты");
         commonTable.setRepository(repository);
         return commonTable;
     }
 
     @Bean("doctorsTable")
-    public Component doctorsTable(@Autowired @Qualifier("doctorRepository") CrudRepository repository) {
-        CommonTable commonTable = new CommonTable<>(DoctorDAO.class);
+    public Component doctorsTable(
+            @Autowired @Qualifier("doctorRepository") CrudRepository<DoctorDAO, Long> repository) {
+        CommonTable<DoctorDAO> commonTable = new DoctorTable();
         commonTable.setCaption("Врачи");
         commonTable.setRepository(repository);
         return commonTable;
@@ -41,7 +45,7 @@ public class UiConfig {
 
     @Bean
     public Component recipeTable(
-            @Autowired @Qualifier("recipeRepository") CrudRepository repository,
+            @Autowired @Qualifier("recipeRepository") CrudRepository<RecipeDAO, Long> repository,
             @Autowired RepositoryService repositoryService) {
         RecipeTable recipeTable = new RecipeTable();
         recipeTable.setCaption("Рецепты");
